@@ -1,0 +1,10 @@
+= Selenium tests on hub
+
+Starts a selenium hub on http://localhost:4444/grid/console
+and run a simple search on google webdriver test
+
+== Run it
+
+docker-compose up
+mvn clean test
+
