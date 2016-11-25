@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: selenium-node-chrome
+metadata:
+  annotations:
+    description: |
+      selenium-node-chrome
+    iconClass: icon-spring
+    tags: chrome
+  name: selenium-node-chrome
+objects:
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app_name: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    ports:
+    - name: 5555-tcp
+      nodePort: 0
+      port: 5555
+      protocol: TCP
+      targetPort: 5555
+    selector:
+      app_name: ${APP_NAME}
+      deploymentconfig: ${APP_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app_name: ${APP_NAME}
+      template: docker-image
+    name: ${APP_NAME}
+  spec:
+    replicas: 1
+    selector:
+      app_name: ${APP_NAME}
+      deploymentconfig: ${APP_NAME}
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app_name: ${APP_NAME}
+          deploymentconfig: ${APP_NAME}
+          template: javase
+      spec:
+        containers:
+        - env:
+          - name: APP_NAME
+            value: ${APP_NAME}
+          - name: PBD_URL
+            value: ${PBD_URL}
+          - name: JAVA_OPTS_EXT
+            value: ${JAVA_OPTS_EXT}
+          - name: JAVA_PARAMETERS
+            value: ${JAVA_PARAMETERS}
+          - name: PROJECT_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: WILY_MOM_FQDN
+            value: ${WILY_MOM_FQDN}
+          - name: WILY_MOM_PORT
+            value: ${WILY_MOM_PORT}
+          - name: TZ
+            value: ${TZ}
+          image: selenium/node-chrome
+          imagePullPolicy: IfNotPresent
+          name: ${APP_NAME}
+          ports:
+          - containerPort: 5555
+            protocol: TCP
+          resources:
+            limits:
+              memory: ${POD_MAX_MEM}M
+            request:
+              memory: ${POD_MAX_MEM}M
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /opt/metadata
+            name: podinfo
+            readOnly: false
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        volumes:
+        - metadata:
+            items:
+            - fieldRef:
+                fieldPath: metadata.labels
+              name: labels
+            - fieldRef:
+                fieldPath: metadata.annotations
+              name: annotations
+          name: podinfo
+  status: {}
+parameters:
+- description: Application name
+  displayName: Application Name
+  name: APP_NAME
+  required: true
+  value: "node-chrome"
+- description: Maximum memory for the pods (in Megabytes)
+  displayName: Pods Max Memory
+  name: POD_MAX_MEM
+  value: "512"
+- description: fully qualified domain name of the Wily Introscope MoM server
+  displayName: Wily MOM fqdn
+  name: WILY_MOM_FQDN
+- description: port of the Wily Introscope MoM server
+  displayName: Wily MOM port
+  name: WILY_MOM_PORT
+  value: "5001"
+- description: TimeZone for the running containers.
+  displayName: TimeZone
+  name: TZ
+  value: Europe/Madrid
