@@ -8,3 +8,21 @@ and run a simple search on google webdriver test
 docker-compose up
 mvn clean test
 
+== Openshift
+
+=== All in one
+
+oc create -f template-grid.yml
+oc new-app --template=selenium-hub
+
+=== Separate
+
+oc create -f template-hub.yml
+oc new-app --template=selenium-hub
+oc create -f template-chrome.yml
+oc new-app --template=selenium-node-chrome
+oc create -f template-chrome.yml
+oc new-app --template=selenium-node-firefox
+
+=== Remove app
+oc delete all -l app_name=hub
