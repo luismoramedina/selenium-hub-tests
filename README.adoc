@@ -12,17 +12,30 @@ mvn clean test
 
 === All in one
 
-oc create -f template-grid.yml
-oc new-app --template=selenium-hub
+.oc create -f template-grid.yml
+.oc new-app --template=selenium-hub
 
 === Separate
 
-oc create -f template-hub.yml
-oc new-app --template=selenium-hub
-oc create -f template-chrome.yml
-oc new-app --template=selenium-node-chrome
-oc create -f template-chrome.yml
-oc new-app --template=selenium-node-firefox
+.oc create -f template-hub.yml
+.oc new-app --template=selenium-hub
+.oc create -f template-chrome.yml
+.oc new-app --template=selenium-node-chrome
+.oc create -f template-chrome.yml
+.oc new-app --template=selenium-node-firefox
 
 === Remove app
 oc delete all -l app_name=hub
+
+=== Remove templates
+oc delete template selenium-hub
+oc delete template selenium-node-chrome
+oc delete template selenium-node-firefox
+
+== Configuration
+
+=== Timeout
+You can set GRID_TIMEOUT to 30 (seconds),
+the default 30000 (seconds) value is ridiculous
+
+oc env dc/... GRID_TIMEOUT="30"
