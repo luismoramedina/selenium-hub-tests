@@ -2,11 +2,21 @@ selenium-hub:
   image: selenium/hub
   ports:
     - "4444:4444"
-selenium-firefox:
-  image: selenium/node-firefox
-  links:
-    - selenium-hub:hub
+  environment:
+    - GRID_TIMEOUT=300
+#    - GRID_CLEAN_UP_CYCLE=1000000
+#    - GRID_BROWSER_TIMEOUT=1000000
+#    - GRID_MAX_SESSION=10
+#    - GRID_NODE_POLLING=30
+#    - GRID_NODE_POLLING=60000
+    - SE_OPTS=-debug
 selenium-chrome:
   image: selenium/node-chrome
+  shm_size: 512M
+  dns:
+    - 180.205.136.49
+    - 180.205.136.48
   links:
     - selenium-hub:hub
+  environment:
+    - SE_OPTS=-debug

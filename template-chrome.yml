@@ -96,9 +96,14 @@ objects:
           - mountPath: /opt/metadata
             name: podinfo
             readOnly: false
+          - mountPath: /dev/shm
+            name: dshm
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
         - metadata:
             items:
             - fieldRef:
